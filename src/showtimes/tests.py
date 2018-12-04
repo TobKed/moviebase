@@ -10,7 +10,7 @@ class CinemaBasicTest(TestCase):
     def test_cinema_creation(self):
         c = self.create_cinema()
         self.assertTrue(isinstance(c, Cinema))
-        self.assertEqual(c.__str__(), c.name + "x")
+        self.assertEqual(c.__str__(), c.name)
 
 
 # class CinemaMoreTest(TestCase):
