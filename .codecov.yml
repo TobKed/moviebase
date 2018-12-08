@@ -1,9 +1,9 @@
+fixes:
+  - "::src/"
+
 codecov:
   archive:
     uploads: no
-
-fixes:
-  - "::src/"
 
 coverage:
   precision: 2
