@@ -1,6 +1,3 @@
-fixes:
-  - "::src/"
-
 codecov:
   archive:
     uploads: no
