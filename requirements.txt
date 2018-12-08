@@ -1,3 +1,4 @@
+coverage==4.5.2
 decorator==4.1.2
 Django==1.11.6
 django-extensions==1.9.6
