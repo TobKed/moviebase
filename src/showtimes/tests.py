@@ -1,6 +1,6 @@
 from django.test import TestCase
 from showtimes.models import Cinema, Screening
-
+from rest_framework.test import APITestCase
 
 class CinemaBasicTest(TestCase):
 
@@ -13,12 +13,15 @@ class CinemaBasicTest(TestCase):
         self.assertEqual(c.__str__(), c.name)
 
 
-# class CinemaMoreTest(TestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         # Set up data for the whole TestCase
-#         cls.c1 = Cinema.objects.create(name="only a test", city="only a test")
-#
-#     def test_cinema_creation(self):
-#         c = Cinema.objects.get(id=1)
-#         self.assertEqual(c.__str__(), c.name)
+class CinemaMoreTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up data for the whole TestCase
+        cls.c1 = Cinema.objects.create(name="only a test", city="only a test")
+
+    def test_cinema_creation(self):
+        c = Cinema.objects.get(id=1)
+        self.assertEqual(c.__str__(), c.name)
+
+
+# class CinemaApiTest(APITestCase):
