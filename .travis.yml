@@ -8,3 +8,6 @@ before_script:
   - cd src
 script:
   - python manage.py test
+branches:
+  only:
+    - master
