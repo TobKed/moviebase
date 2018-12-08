@@ -3,7 +3,7 @@ from showtimes.models import Cinema, Screening
 from movielist.models import Movie, Person
 from rest_framework.test import APITestCase
 from datetime import date
-from random import randint, sample
+from random import randint, sample, choice
 from faker import Faker
 
 
@@ -42,9 +42,10 @@ class ScreeningTestCase(TestCase):
             Person.objects.create(name=self.faker.name())
         for _ in range(5):
             self._create_fake_movie()
-
         for _ in range(5):
             self._create_fake_cinema()
+        for _ in range(5):
+            self._create_fake_screening()
 
     def _random_person(self):
         """Return a random Person object from db."""
@@ -93,6 +94,18 @@ class ScreeningTestCase(TestCase):
         cinema = Cinema.objects.create(name=name, city=city)
         cinema.movies_set = movies
 
+    def _create_fake_screening(self):
+        """Generate new fake screening and save to database."""
+        cinema = choice(Cinema.objects.all())
+        movie = choice(Movie.objects.all())
+        dete_ = self.faker.date()
+        Screening.objects.create(cinema=cinema, movie=movie, date=dete_)
+
     def test_create_screening(self):
         with self.assertRaises(Exception):
             Screening.objects.create()
+
+    def test_get_cinemas_list(self):
+        response = self.client.get(path="/cinemas/", data={}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Cinema.objects.count(), len(response.data))
