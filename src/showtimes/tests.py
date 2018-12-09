@@ -7,35 +7,8 @@ from random import randint, sample, choice
 from faker import Faker
 
 
-class CinemaBasicTestCase(TestCase):
-    def create_cinema(self, name="only a test", city="only a test"):
-        return Cinema.objects.create(name=name, city=city)
-
-    def test_cinema_creation(self):
-        c = self.create_cinema()
-        self.assertTrue(isinstance(c, Cinema))
-        self.assertEqual(c.__str__(), c.name)
-
-
-class CinemaMoreTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Set up data for the whole TestCase
-        cls.c1 = Cinema.objects.create(name="only a test", city="only a test")
-
-    def test_cinema_creation(self):
-        c = Cinema.objects.get(id=1)
-        self.assertEqual(c.__str__(), c.name)
-
-
-class SceeningBasicTestCase(TestCase):
-    def test_create_screening(self):
-        with self.assertRaises(Exception):
-            Screening.objects.create()
-
-
-class ScreeningTestCase(TestCase):
-    def setUp(self):
+class FakeData:
+    def __init__(self):
         """Populate test database with random data."""
         self.faker = Faker("pl_PL")
         for _ in range(5):
@@ -51,6 +24,21 @@ class ScreeningTestCase(TestCase):
         """Return a random Person object from db."""
         people = Person.objects.all()
         return people[randint(0, len(people) - 1)]
+    
+    def _random_movie(self):
+        """Return a random Movie object from db."""
+        movie = Movie.objects.all()
+        return movie[randint(0, len(movie) - 1)]
+    
+    def _random_cinema(self):
+        """Return a random Cinema object from db."""
+        cinema = Cinema.objects.all()
+        return cinema[randint(0, len(cinema) - 1)]
+    
+    def _random_screening(self):
+        """Return a random Cinema object from db."""
+        screening = Screening.objects.all()
+        return screening[randint(0, len(screening) - 1)]
 
     def _find_person_by_name(self, name):
         """Return the first `Person` object that matches `name`."""
@@ -100,6 +88,39 @@ class ScreeningTestCase(TestCase):
         movie = choice(Movie.objects.all())
         dete_ = self.faker.date()
         Screening.objects.create(cinema=cinema, movie=movie, date=dete_)
+
+
+class CinemaBasicTestCase(TestCase):
+    def create_cinema(self, name="only a test", city="only a test"):
+        return Cinema.objects.create(name=name, city=city)
+
+    def test_cinema_creation(self):
+        c = self.create_cinema()
+        self.assertTrue(isinstance(c, Cinema))
+        self.assertEqual(c.__str__(), c.name)
+
+
+class CinemaMoreTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up data for the whole TestCase
+        cls.c1 = Cinema.objects.create(name="only a test", city="only a test")
+
+    def test_cinema_creation(self):
+        c = Cinema.objects.get(id=1)
+        self.assertEqual(c.__str__(), c.name)
+
+
+class SceeningBasicTestCase(TestCase):
+    def test_create_screening(self):
+        with self.assertRaises(Exception):
+            Screening.objects.create()
+
+
+class ScreeningTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.fake_data = FakeData()
 
     def test_create_screening(self):
         with self.assertRaises(Exception):
