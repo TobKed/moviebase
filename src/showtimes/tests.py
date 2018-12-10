@@ -73,13 +73,19 @@ class FakeData:
         for actor in actors:
             new_movie.actors.add(self._find_person_by_name(actor))
 
+    def _fake_cinema_data(self):
+        cinema_data = {
+            "name": self.faker.company(),
+            "city": self.faker.city(),
+        }
+        movies = Movie.objects.all()
+        movies = sample(list(movies), randint(0, len(movies)))
+        return cinema_data, movies
+
     def _create_fake_cinema(self):
         """Generate new fake cinema and save to database."""
-        name = self.faker.company()
-        city = self.faker.city()
-        movies = Movie.objects.all()
-        movies = sample(list(movies), randint(1, len(movies)))
-        cinema = Cinema.objects.create(name=name, city=city)
+        cinema_data, movies = self._fake_cinema_data()
+        cinema = Cinema.objects.create(**cinema_data)
         cinema.movies_set = movies
 
     def _create_fake_screening(self):
@@ -100,18 +106,38 @@ class CinemaBasicTestCase(TestCase):
         self.assertEqual(c.__str__(), c.name)
 
 
-class CinemaMoreTestCase(TestCase):
+class CinemaMoreTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        # Set up data for the whole TestCase
-        cls.c1 = Cinema.objects.create(name="only a test", city="only a test")
+        cls.fake_data = FakeData()
 
-    def test_cinema_creation(self):
-        c = Cinema.objects.get(id=1)
-        self.assertEqual(c.__str__(), c.name)
+    def test_get_cinema_list(self):
+        response = self.client.get("/cinemas/", {}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Cinema.objects.count(), len(response.data))
+
+    def test_delete_cinema(self):
+        response = self.client.delete("/cinemas/1/", {}, format='json')
+        self.assertEqual(response.status_code, 204)
+        cinema_ids = [cinema.id for cinema in Cinema.objects.all()]
+        self.assertNotIn(1, cinema_ids)
+
+    def test_post_cinema(self):
+        cinemas_before = Cinema.objects.count()
+        new_cinema_data, new_cinema_movies = self.fake_data._fake_cinema_data()
+        response = self.client.post("/cinemas/", new_cinema_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Cinema.objects.count(), cinemas_before + 1)
+        for key, val in new_cinema_data.items():
+            self.assertIn(key, response.data)
+            if isinstance(val, list):
+                # Compare contents regardless of their order
+                self.assertCountEqual(response.data[key], val)
+            else:
+                self.assertEqual(response.data[key], val)
 
 
-class SceeningBasicTestCase(TestCase):
+class ScreeningBasicTestCase(TestCase):
     def test_create_screening(self):
         with self.assertRaises(Exception):
             Screening.objects.create()
